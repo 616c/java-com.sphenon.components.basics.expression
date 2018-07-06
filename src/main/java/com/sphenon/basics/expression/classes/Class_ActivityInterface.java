@@ -1,0 +1,47 @@
+package com.sphenon.basics.expression.classes;
+
+/****************************************************************************
+  Copyright 2001-2018 Sphenon GmbH
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations
+  under the License.
+*****************************************************************************/
+
+import com.sphenon.basics.context.*;
+import com.sphenon.basics.context.classes.*;
+import com.sphenon.basics.message.*;
+import com.sphenon.basics.notification.*;
+import com.sphenon.basics.exception.*;
+import com.sphenon.basics.customary.*;
+
+import com.sphenon.basics.expression.*;
+import com.sphenon.basics.expression.returncodes.*;
+
+import java.util.Vector;
+
+public class Class_ActivityInterface implements ActivityInterface {
+
+    public Class_ActivityInterface(CallContext context) {
+    }
+
+    protected Vector<ActivityAttribute> attributes;
+
+    public Vector<ActivityAttribute> getAttributes (CallContext context) {
+        return this.attributes;
+    }
+
+    public void addAttribute (CallContext context, ActivityAttribute attribute) {
+        if (this.attributes == null) {
+            this.attributes = new Vector<ActivityAttribute>();
+        }
+        this.attributes.add(attribute);
+    }
+}
+
