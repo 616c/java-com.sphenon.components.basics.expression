@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -16,12 +16,18 @@ package com.sphenon.basics.expression.classes;
 
 import com.sphenon.basics.context.*;
 import com.sphenon.basics.context.classes.*;
+import com.sphenon.basics.debug.*;
+import com.sphenon.basics.system.*;
 import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
 import com.sphenon.basics.operations.*;
 import com.sphenon.basics.operations.classes.*;
+import com.sphenon.basics.operations.factories.*;
+import com.sphenon.basics.data.DataSink;
+import com.sphenon.basics.data.DataSinkBase;
+import com.sphenon.basics.monitoring.*;
 
 import com.sphenon.basics.expression.*;
 import com.sphenon.basics.expression.returncodes.*;
@@ -37,8 +43,14 @@ public class Activity_ExpressionEvaluatorSequence implements Activity, ContextAw
     protected Scope scope;
 
     public Execution execute(CallContext context) {
+        return execute(context, null);
+    }
+
+    public Execution execute(CallContext context, DataSink<Execution> execution_sink) {
         Object current = this.activity_class.getExpression(context);
         ExpressionEvaluatorRegistry registry = this.activity_class.getRegistry(context);
+
+        ExecutionHandler eh = new ExecutionHandler(context, execution_sink, this.activity_class.getDescription(context));
 
         int s=0;
         for (String[] evaluator : this.activity_class.getEvaluators(context)) {
@@ -50,15 +62,49 @@ public class Activity_ExpressionEvaluatorSequence implements Activity, ContextAw
             
             if (id == null || id.isEmpty()) { continue; }
 
-            Scope current_scope = Expression.mergeScopeWithSessionScope(context, scope, actor, session);
+            if (id.equals("check")) {
+                if (current instanceof Execution) {
+                    Execution execution = (Execution) current;
+                    ProblemState ps = execution.getProblemState(context);
+                    if (execution_sink != null) {
+                        execution_sink.set(context, execution);
+                    }
+                    if (ps.isRed(context)) {
+                        return execution;
+                    }
+                    current = ps == null ? "" : ps.toString();
+                } else if (current instanceof Throwable) {
+                    Execution execution = Factory_Execution.createExecutionFailure(context, (Throwable) current);
+                    if (execution_sink != null) {
+                        execution_sink.set(context, execution);
+                    }
+                    return execution;
+                }
+            } else if (id.equals("log")) {
+                SystemContext.err.stream(context).flush();
+                Dumper.dumpToStream(context, null, current, SystemContext.err.stream(context));
+                SystemContext.err.stream(context).flush();
+            } else {
+                try {
+                    Scope current_scope = Expression.mergeScopeWithSessionScope(context, this.scope, actor, session);
 
-            boolean got_location = (location != null && location.isEmpty() == false);
+                    boolean got_location = (location != null && location.isEmpty() == false);
 
-            ActivityHandler ah = ActivityHandler_Expression.createWithEvaluatorId(context, current, id, actor, location, session, got_location ? null : registry);
-            if (ah.execute(context, current_scope).isValid(context) == false) {
-                return Execution_BasicSequence.createExecutionSequence(context, createMessage(context, s), ah.getExecution(context));
+                    ActivityHandler ah = ActivityHandler_Expression.createWithEvaluatorId(context, current, id, actor, location, session, got_location ? null : registry);
+                    ah.setExecutionSink(context, eh.createReportingSink(context));
+
+                    if (ah.execute(context, current_scope).isValid(context) == false) {
+                        return eh.add(context, Factory_Execution.createExecutionSequence(context, createMessage(context, s), ah.getExecution(context)));
+                    }
+                    current = ah.getSlots(context).get(0).getValue(context);
+                } catch (Throwable t) {
+                    Execution execution = Factory_Execution.createExecutionFailure(context, t);
+                    if (execution_sink != null) {
+                        execution_sink.set(context, execution);
+                    }
+                    return execution;
+                }
             }
-            current = ah.getSlots(context).get(0).getValue(context);
 
             s++;
         }
@@ -66,7 +112,7 @@ public class Activity_ExpressionEvaluatorSequence implements Activity, ContextAw
         this.data = new Class_ActivityData(context);
         this.data.addSlot(context, new Class_ActivitySlot(context, this.activity_class.getInterface(context).getAttributes(context).get(0), current));
 
-        return Execution_Basic.createExecutionSuccess(context);
+        return Factory_Execution.createExecutionSuccess(context);
     }
 
     protected String createMessage(CallContext context, int s) {

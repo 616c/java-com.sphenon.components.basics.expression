@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.parsed;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -37,5 +37,13 @@ public class OR extends ExpressionBase {
 
     public Object getValue(CallContext context, Scope scope) throws EvaluationFailure {
         return (c1.isTrue(context, scope) || c2.isTrue(context, scope));
+    }
+
+    public Expression getLeftExpression(CallContext context) {
+        return c1;
+    }
+
+    public Expression getRightExpression(CallContext context) {
+        return c2;
     }
 }

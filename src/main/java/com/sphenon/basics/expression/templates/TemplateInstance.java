@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.templates;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -62,6 +62,15 @@ public class TemplateInstance {
                     this.arguments.add(tia);
                 }
             }
+        }
+    }
+
+    static public TemplateInstance create(CallContext context, String template_instance_expression) {
+        try {
+            return TemplateInstanceParser.parse(context, template_instance_expression);
+        } catch (ParseException pe) {
+            CustomaryContext.create((Context)context).throwPreConditionViolation(context, pe, "Invalid template instance expression");
+            throw (ExceptionPreConditionViolation) null;
         }
     }
 

@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.parsed;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -42,5 +42,9 @@ public class Name extends Terminal {
             EvaluationFailure.createAndThrow(context, nsv, "Terminal '%(name)' is not defined", "name", name);
             throw (EvaluationFailure) null;
         }
+    }
+
+    public String getName(CallContext context) {
+        return name;
     }
 }

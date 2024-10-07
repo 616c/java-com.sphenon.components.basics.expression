@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -20,10 +20,12 @@ import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
+import com.sphenon.basics.data.*;
+import com.sphenon.basics.operations.*;
 
 import com.sphenon.basics.expression.returncodes.*;
 
 public interface ExpressionSourceAware {
 
-    public Object evaluate(CallContext context, ExpressionSource expression_source, Scope scope) throws EvaluationFailure;
+    public Object evaluate(CallContext context, ExpressionSource expression_source, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure;
 }

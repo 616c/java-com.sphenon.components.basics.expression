@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -16,6 +16,7 @@ package com.sphenon.basics.expression.classes;
 
 import com.sphenon.basics.context.*;
 import com.sphenon.basics.context.classes.*;
+import com.sphenon.basics.debug.*;
 import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
@@ -39,7 +40,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class Class_Scope implements Scope {
+public class Class_Scope implements Scope, Dumpable {
 
     public Class_Scope(CallContext context)                                                                    { this(context, null      , null               ); }
     public Class_Scope(CallContext context, String name_space  )                                               { this(context, name_space, null               ); }
@@ -155,6 +156,7 @@ public class Class_Scope implements Scope {
     public Result doGet (CallContext context, String name, String search_name_space, boolean throw_exception) throws NoSuchVariable {
         Result result;
 
+        String original_search_name_space = search_name_space;
         boolean sns_opt = false;
         if (search_name_space != null && search_name_space.startsWith("?")) {
             sns_opt = true;
@@ -188,11 +190,11 @@ public class Class_Scope implements Scope {
             for (Named<Scope> named_parent : this.parents) {
                 String parent_name = named_parent.getName(context);
                 if (parent_name == null) {
-                    result = named_parent.getData(context).doGet(context, name, search_name_space, false);
-                } else {
+                    result = named_parent.getData(context).doGet(context, name, original_search_name_space, false);
+                } else if (search_name_space != null) {
                     String[] snsp = search_name_space.split("\\.",2);
                     if (parent_name.equals(snsp[0])) {
-                        result = named_parent.getData(context).doGet(context, name, snsp.length == 1 ? null : snsp[1], false);
+                        result = named_parent.getData(context).doGet(context, name, snsp.length == 1 ? null : ((sns_opt ? "?" : "") + snsp[1]), false);
                     }
                 }
                 if (result != null) { return result; }
@@ -526,5 +528,32 @@ public class Class_Scope implements Scope {
             }
         }
         return result;
+    }
+
+    public void dump(CallContext context, DumpNode dump_node) {
+        if (this.name_space != null) {
+            dump_node.dump(context, "NameSpace", this.name_space);
+        }
+        dump_node.dump(context, "IsSealed", this.is_sealed);
+        if (this.variables != null) {
+            DumpNode dn = dump_node.openDump(context, "Variables");
+            for (String name : this.variables.keySet()) {
+                dn.dump(context, name, this.variables.get(name));
+            }
+        }
+        if (this.on_demand_variables != null) {
+            DumpNode dn = dump_node.openDump(context, "Variables (OnDemand)");
+            for (String name : this.on_demand_variables.keySet()) {
+                dn.dump(context, name, this.on_demand_variables.get(name));
+            }
+        }
+        if (this.parents != null) {
+            DumpNode dn = dump_node.openDump(context, "Parent Scopes");
+            for (Named<Scope> named_parent : this.parents) {
+                String parent_name = named_parent.getName(context);
+                Scope parent_scope = named_parent.getData(context);
+                dn.dump(context, parent_name, parent_scope);
+            }
+        }
     }
 }

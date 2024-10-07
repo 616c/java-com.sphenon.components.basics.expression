@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -23,6 +23,8 @@ import com.sphenon.basics.customary.*;
 import com.sphenon.basics.encoding.*;
 import com.sphenon.basics.operations.*;
 import com.sphenon.basics.services.*;
+import com.sphenon.basics.data.*;
+import com.sphenon.basics.operations.*;
 
 import com.sphenon.basics.expression.*;
 import com.sphenon.basics.expression.classes.*;
@@ -54,10 +56,10 @@ public class Class_ExpressionEvaluatorService implements ExpressionEvaluatorServ
         }
     }
 
-    public Object evaluateWithEvaluator(CallContext context, String code, String evaluator_id, Scope current_scope, String actor_id, String session_id) throws EvaluationFailure {
+    public Object evaluateWithEvaluator(CallContext context, String code, String evaluator_id, Scope current_scope, String actor_id, String session_id, DataSink<Execution> execution_sink) throws EvaluationFailure {
         ExpressionEvaluator evaluator = registry.retrieve(context, evaluator_id, false);
         current_scope = Expression.mergeScopeWithSessionScope(context, current_scope, actor_id, session_id);
-        return evaluator.evaluate(context, code, current_scope);
+        return evaluator.evaluate(context, code, current_scope, execution_sink);
     }
 
     public ActivityClass parseWithEvaluator(CallContext context, ExpressionSource expression_source, String evaluator_id) throws EvaluationFailure {

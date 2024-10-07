@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.parsed;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -78,11 +78,21 @@ public class Equal extends ExpressionBase {
         if (e1 instanceof TypeName && e2 instanceof TypeName) {
             return ((TypeName) e1).equals(context, ((TypeName) e2));
         } else if (e1 instanceof Terminal && e2 instanceof Terminal) {
-            String s1 = e1.getValue(context, scope).toString();
-            String s2 = e2.getValue(context, scope).toString();
+            Object o1 = e1.getValue(context, scope);
+            Object o2 = e2.getValue(context, scope);
+            String s1 = o1 == null ? null : o1.toString();
+            String s2 = o2 == null ? null : o2.toString();
             return (s1 == null && s2 == null) || (s1 != null && s2 != null && s1.equals(s2));
         } else {
             return ((e1.isTrue(context, scope) == true) == (e2.isTrue(context, scope) == true));
         }
+    }
+
+    public Expression getLeftExpression(CallContext context) {
+        return c1;
+    }
+
+    public Expression getRightExpression(CallContext context) {
+        return c2;
     }
 }

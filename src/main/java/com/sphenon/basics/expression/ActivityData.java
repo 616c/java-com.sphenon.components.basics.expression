@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -27,6 +27,7 @@ import java.util.Vector;
 
 public interface ActivityData {
     public Vector<ActivitySlot> getSlots(CallContext context);
+    public Object getSlotValue(CallContext context, int index);
     public Object getSlotValue(CallContext context, String name);
 }
 

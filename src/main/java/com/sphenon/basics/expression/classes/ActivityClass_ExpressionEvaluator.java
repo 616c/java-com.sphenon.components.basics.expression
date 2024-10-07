@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -28,11 +28,22 @@ import com.sphenon.basics.expression.returncodes.*;
 public class ActivityClass_ExpressionEvaluator implements ActivityClass {
 
     public ActivityClass_ExpressionEvaluator(CallContext context, ExpressionEvaluator expression_evaluator, ExpressionSource expression_source, ActivityInterface activity_interface, ActivityAttribute result_attribute, ArgumentSerialiser argument_serialiser) {
-        this.expression_evaluator = expression_evaluator;
-        this.expression_source = expression_source;
-        this.activity_interface = activity_interface;
-        this.result_attribute = result_attribute;
-        this.argument_serialiser = argument_serialiser;
+        this.expression_evaluator         = expression_evaluator;
+        this.expression_evaluator_service = null;
+        this.expression_source            = expression_source;
+        this.activity_interface           = activity_interface;
+        this.result_attribute             = result_attribute;
+        this.argument_serialiser          = argument_serialiser;
+    }
+
+    public ActivityClass_ExpressionEvaluator(CallContext context, ExpressionEvaluatorService expression_evaluator_service, String evaluator_id, ExpressionSource expression_source, ActivityInterface activity_interface, ActivityAttribute result_attribute, ArgumentSerialiser argument_serialiser) {
+        this.expression_evaluator         = null;
+        this.expression_evaluator_service = expression_evaluator_service;
+        this.expression_source            = expression_source;
+        this.activity_interface           = activity_interface;
+        this.result_attribute             = result_attribute;
+        this.argument_serialiser          = argument_serialiser;
+        this.evaluator_id                 = evaluator_id;
     }
 
     public ActivityClass_ExpressionEvaluator(CallContext context, ExpressionEvaluator expression_evaluator, ExpressionSource expression_source, ActivityInterface activity_interface, ActivityAttribute result_attribute, boolean by_value, EncodingStep[] steps) {
@@ -43,13 +54,30 @@ public class ActivityClass_ExpressionEvaluator implements ActivityClass {
         this(context, expression_evaluator, expression_source, activity_interface, result_attribute, null);
     }
 
-    protected ExpressionEvaluator expression_evaluator;
-    protected ExpressionSource expression_source;
-    protected ArgumentSerialiser argument_serialiser;
-    protected EncodingStep[] steps;
+    public ActivityClass_ExpressionEvaluator(CallContext context, ExpressionEvaluatorService expression_evaluator_service, String evaluator_id, ExpressionSource expression_source, ActivityInterface activity_interface, ActivityAttribute result_attribute, boolean by_value, EncodingStep[] steps) {
+        this(context, expression_evaluator_service, evaluator_id, expression_source, activity_interface, result_attribute, by_value ? new ArgumentSerialiser_ByValue(context, steps) : new ArgumentSerialiser_ByName(context, steps));
+    }
+
+    public ActivityClass_ExpressionEvaluator(CallContext context, ExpressionEvaluatorService expression_evaluator_service, String evaluator_id, ExpressionSource expression_source, ActivityInterface activity_interface, ActivityAttribute result_attribute) {
+        this(context, expression_evaluator_service, evaluator_id, expression_source, activity_interface, result_attribute, null);
+    }
+
+    protected ExpressionEvaluator        expression_evaluator;
+
+    protected ExpressionEvaluatorService expression_evaluator_service;
+    protected String                     evaluator_id;
+
+    protected ExpressionSource           expression_source;
+
+    protected ArgumentSerialiser         argument_serialiser;
+    protected EncodingStep[]             steps;
 
     public ExpressionEvaluator getExpressionEvaluator (CallContext context) {
         return this.expression_evaluator;
+    }
+
+    public ExpressionEvaluatorService getExpressionEvaluatorService (CallContext context) {
+        return this.expression_evaluator_service;
     }
 
     public ExpressionSource getExpressionSource (CallContext context) {
@@ -72,7 +100,9 @@ public class ActivityClass_ExpressionEvaluator implements ActivityClass {
         current_scope = Expression.mergeScopeWithSessionScope(context, current_scope, null, null);
         /* ------------------------------------------------------------------------------ */
 
-        return new Activity_ExpressionEvaluator(context, this.expression_evaluator, this.expression_source, this.argument_serialiser, current_scope, this.result_attribute);
+        return this.expression_evaluator_service != null
+                ? new Activity_ExpressionEvaluator(context, this.expression_evaluator_service, this.evaluator_id, this.expression_source, this.argument_serialiser, current_scope, this.result_attribute)
+                : new Activity_ExpressionEvaluator(context, this.expression_evaluator, this.expression_source, this.argument_serialiser, current_scope, this.result_attribute);
     }
 
     protected ActivityInterface activity_interface;

@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -20,6 +20,8 @@ import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
+import com.sphenon.basics.data.*;
+import com.sphenon.basics.operations.*;
 
 import com.sphenon.basics.expression.classes.*;
 import com.sphenon.basics.expression.returncodes.*;
@@ -51,10 +53,10 @@ public class DynamicStringProcessor_Sequence implements ExpressionEvaluator {
         return ids;
     }
 
-    public Object evaluate(CallContext context, String string, Scope scope) throws EvaluationFailure{
+    public Object evaluate(CallContext context, String string, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure{
         for (String processor_id : processors) {
 
-            Object result = Expression.evaluateWithEvaluator(context, string, processor_id, scope, null, null, true, null);
+            Object result = Expression.evaluateWithEvaluator(context, string, processor_id, scope, null, null, true, null, execution_sink);
             try {
                 string = (String) result;
             } catch (ClassCastException cce) {

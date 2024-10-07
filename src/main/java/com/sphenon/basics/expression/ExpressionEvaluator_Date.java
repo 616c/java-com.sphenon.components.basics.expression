@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -20,6 +20,9 @@ import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
+import com.sphenon.basics.format.*;
+import com.sphenon.basics.data.*;
+import com.sphenon.basics.operations.*;
 
 import com.sphenon.basics.expression.classes.*;
 import com.sphenon.basics.expression.returncodes.*;
@@ -42,8 +45,18 @@ public class ExpressionEvaluator_Date implements ExpressionEvaluator {
         return new String[] { "date" };
     }
 
-    public Object evaluate(CallContext context, String string, Scope scope) {
-    return (new SimpleDateFormat(string)).format(new Date());
+    public Object evaluate(CallContext context, String string, Scope scope, DataSink<Execution> execution_sink) {
+        return (new SimpleDateFormat(string)).format(new Date());
+        /* used in Backup.script(s) "date:yyyyMMddHHmmss"
+           check what
+           Formatter.format(context, "yyyyMMddHHmmss", ...) would do
+           String Formatter.format(CallContext context, String format, Object value);
+           Object Formatter.parse(CallContext context, String format, String string);
+
+           additionally, allow    date:fmt1:fmt2:stringdate    which parses string date and formats it
+                           and    date:now                     which just returns current date as Date instance
+                           and    date::fmt2:stringdate        which parses string date and returns Date instance
+        */
     }
 
     public ActivityClass parse(CallContext context, ExpressionSource expression_source) throws EvaluationFailure {

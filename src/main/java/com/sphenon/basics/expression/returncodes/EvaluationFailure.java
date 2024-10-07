@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.returncodes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -31,268 +31,268 @@ public class EvaluationFailure extends ReturnCode {
         super(context, cause, message);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, Message message) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, Message message) {
         if ((notification_level & Notifier.MORE_VERBOSE) != 0) { CustomaryContext.create(Context.create(context)).sendTrace(context, Notifier.MORE_VERBOSE, "returning 'EvaluationFailure' : %(message)", "message", message == null ? (Object) "(no details)" : (Object) message); }
         return new EvaluationFailure(context, cause, message);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context) {
-        return createEvaluationFailure(context, (Throwable) null, (Message) null);
+    static public EvaluationFailure create (CallContext context) {
+        return create(context, (Throwable) null, (Message) null);
     }
 
     static public void createAndThrow (CallContext context) throws EvaluationFailure {
-        throw createEvaluationFailure(context);
+        throw create(context);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message) {
+    static public EvaluationFailure create (CallContext context, String message) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message);
+        throw create(context, message);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message);
+        throw create(context, cause, message);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message, Object[][] attributes) {
+    static public EvaluationFailure create (CallContext context, String message, Object[][] attributes) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, attributes));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message, Object[][] attributes) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, attributes);
+        throw create(context, message, attributes);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message, Object[][] attributes) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message, Object[][] attributes) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, attributes));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message, Object[][] attributes) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, attributes);
+        throw create(context, cause, message, attributes);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message, String an1, Object av1) {
+    static public EvaluationFailure create (CallContext context, String message, String an1, Object av1) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message, String an1, Object av1) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1);
+        throw create(context, message, an1, av1);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message, String an1, Object av1) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message, String an1, Object av1) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message, String an1, Object av1) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1);
+        throw create(context, cause, message, an1, av1);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message, String an1, Object av1, String an2, Object av2) {
+    static public EvaluationFailure create (CallContext context, String message, String an1, Object av1, String an2, Object av2) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message, String an1, Object av1, String an2, Object av2) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2);
+        throw create(context, message, an1, av1, an2, av2);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2);
+        throw create(context, cause, message, an1, av1, an2, av2);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
+    static public EvaluationFailure create (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2, an3, av3);
+        throw create(context, message, an1, av1, an2, av2, an3, av3);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2, an3, av3);
+        throw create(context, cause, message, an1, av1, an2, av2, an3, av3);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
+    static public EvaluationFailure create (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2, an3, av3, an4, av4);
+        throw create(context, message, an1, av1, an2, av2, an3, av3, an4, av4);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4);
+        throw create(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
+    static public EvaluationFailure create (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
+        throw create(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, String message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
+        throw create(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message) {
+    static public EvaluationFailure create (CallContext context, VariativeString message) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message);
+        throw create(context, message);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message);
+        throw create(context, cause, message);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message, Object[][] attributes) {
+    static public EvaluationFailure create (CallContext context, VariativeString message, Object[][] attributes) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, attributes));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message, Object[][] attributes) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, attributes);
+        throw create(context, message, attributes);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message, Object[][] attributes) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message, Object[][] attributes) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, attributes));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message, Object[][] attributes) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, attributes);
+        throw create(context, cause, message, attributes);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message, String an1, Object av1) {
+    static public EvaluationFailure create (CallContext context, VariativeString message, String an1, Object av1) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message, String an1, Object av1) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1);
+        throw create(context, message, an1, av1);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message, String an1, Object av1) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message, String an1, Object av1) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message, String an1, Object av1) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1);
+        throw create(context, cause, message, an1, av1);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2) {
+    static public EvaluationFailure create (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2);
+        throw create(context, message, an1, av1, an2, av2);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2);
+        throw create(context, cause, message, an1, av1, an2, av2);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
+    static public EvaluationFailure create (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2, an3, av3);
+        throw create(context, message, an1, av1, an2, av2, an3, av3);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2, an3, av3);
+        throw create(context, cause, message, an1, av1, an2, av2, an3, av3);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
+    static public EvaluationFailure create (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2, an3, av3, an4, av4);
+        throw create(context, message, an1, av1, an2, av2, an3, av3, an4, av4);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4);
+        throw create(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
+    static public EvaluationFailure create (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5));
-        return createEvaluationFailure(context, (Throwable) null, msg);
+        return create(context, (Throwable) null, msg);
     }
 
     static public void createAndThrow (CallContext context, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) throws EvaluationFailure {
-        throw createEvaluationFailure(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
+        throw create(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
     }
 
-    static public EvaluationFailure createEvaluationFailure (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
+    static public EvaluationFailure create (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) {
         Message msg = DetailMessage.create(context, MessageText.create(context, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5));
-        return createEvaluationFailure(context, cause, msg);
+        return create(context, cause, msg);
     }
 
     static public void createAndThrow (CallContext context, Throwable cause, VariativeString message, String an1, Object av1, String an2, Object av2, String an3, Object av3, String an4, Object av4, String an5, Object av5) throws EvaluationFailure {
-        throw createEvaluationFailure(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
+        throw create(context, cause, message, an1, av1, an2, av2, an3, av3, an4, av4, an5, av5);
     }
 }

@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -45,6 +45,10 @@ public class ArgumentSerialiser_ByName implements ArgumentSerialiser {
 
     public String serialise(CallContext context, ExpressionSourceEntry ese, Scope scope) throws EvaluationFailure {
         String name = ese.getName(context);
+        if (scope == null) {
+            CustomaryContext.create((Context)context).throwPreConditionViolation(context, "No scope provided to serialise data into");
+            throw (ExceptionPreConditionViolation) null; // compiler insists
+        }
         scope.setOnDemand(context, name, new DataSource_ExpressionSourceEntry(context, ese, scope));
         if (steps != null) {
             name = Encoding.recode(context, name, steps);

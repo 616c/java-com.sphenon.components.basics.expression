@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -26,11 +26,12 @@ import com.sphenon.basics.expression.returncodes.*;
 
 public class ActivityClass_ExpressionEvaluatorSequence implements ActivityClass, ContextAware {
 
-    public ActivityClass_ExpressionEvaluatorSequence(CallContext context, String[][] evaluators, String expression, Scope base_scope, ExpressionEvaluatorRegistry registry) {
-        this.evaluators = evaluators;
-        this.expression = expression;
-        this.base_scope = base_scope;
-        this.registry   = registry;
+    public ActivityClass_ExpressionEvaluatorSequence(CallContext context, String[][] evaluators, String expression, Scope base_scope, String description, ExpressionEvaluatorRegistry registry) {
+        this.evaluators  = evaluators;
+        this.expression  = expression;
+        this.base_scope  = base_scope;
+        this.description = description;
+        this.registry    = registry;
     }
 
     protected String description;

@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.parsed;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -29,4 +29,13 @@ public interface Expression {
     public Boolean isTrue(CallContext context, Scope scope) throws EvaluationFailure;
     public void setLHS(CallContext context);
     public void setRHS(CallContext context);
+
+    static public Expression create(CallContext context, String expression) {
+        try {
+            return com.sphenon.basics.expression.parsed.ExpressionParser.parse(context, expression);
+        } catch (com.sphenon.basics.expression.parsed.ParseException pe) {
+            CustomaryContext.create((Context)context).throwPreConditionViolation(context, pe, "Syntax error in expression '%(expression)'", "expression", expression);
+            throw (ExceptionPreConditionViolation) null; // compiler insists
+        }
+    }
 }

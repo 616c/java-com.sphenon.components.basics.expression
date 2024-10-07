@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -40,6 +40,22 @@ public class ExpressionEvaluatorRegistry {
 
     static public void registerDynamicStringEvaluator(CallContext context, ExpressionEvaluator processor) {
         getDefaultExpressionRegistry(context).registerProcessor(context, processor);
+    }
+
+    static public void registerDynamicStringProcessor_RegularExpression(CallContext context, String description) {
+        registerDynamicStringEvaluator(context, DynamicStringProcessor_RegularExpression.createFromString(context, description));
+    }
+
+    static public void registerDynamicStringProcessor_Sequence(CallContext context, String description) {
+        registerDynamicStringEvaluator(context, DynamicStringProcessor_Sequence.createFromString(context, description));
+    }
+
+    static public void registerExpressionEvaluator_RegularExpression(CallContext context, String description) {
+        registerExpressionEvaluator(context, ExpressionEvaluator_RegularExpression.createFromString(context, description));
+    }
+
+    static public void registerExpressionEvaluator_Sequence(CallContext context, String description) {
+        registerExpressionEvaluator(context, ExpressionEvaluator_Sequence.createFromString(context, description));
     }
 
     static protected ExpressionEvaluatorRegistry default_expression_registry;

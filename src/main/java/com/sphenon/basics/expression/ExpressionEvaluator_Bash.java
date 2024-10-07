@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -57,7 +57,7 @@ public class ExpressionEvaluator_Bash extends ExpressionEvaluator_SystemProcess 
 
     protected void startProcess(CallContext context, SystemProcess sp) throws Throwable {
         this.log(context, "starting...");
-        if (dump_to_console) {
+        if (this.dump) {
             if (expect_prompt_at_stdout) {
                 sp.start(context, null, false, true, false, true, false, true, false);
                 sp.configure(context, false, true, false, true, false, false);
@@ -94,8 +94,6 @@ public class ExpressionEvaluator_Bash extends ExpressionEvaluator_SystemProcess 
         this.waitForCompletion(context, sp, true);
     }
 
-    protected boolean dump_to_console = true;
-
     protected Object[] waitForCompletion(CallContext context, SystemProcess sp) throws Throwable {
         return waitForCompletion(context, sp, false);
     }
@@ -103,13 +101,13 @@ public class ExpressionEvaluator_Bash extends ExpressionEvaluator_SystemProcess 
     protected Object[] waitForCompletion(CallContext context, SystemProcess sp, boolean suppress_console) throws Throwable {
         if (expect_prompt_at_stdout) {
             this.log(context, "waiting for prompt (stdout)...");
-            OutputStreamWriter stdout_writer = dump_to_console && ! suppress_console ? new OutputStreamWriter(System.out) : null;
-            String output = BashPromptObserver.waitForPrompt(context, sp.getProcessOutputAsReader(context), ! dump_to_console || suppress_console, stdout_writer);
+            OutputStreamWriter stdout_writer = this.dump && ! suppress_console ? new OutputStreamWriter(System.out) : null;
+            String output = BashPromptObserver.waitForPrompt(context, sp.getProcessOutputAsReader(context), ! this.dump || suppress_console, stdout_writer);
             if (stdout_writer != null) { stdout_writer.flush(); }
         } else {
             this.log(context, "waiting for prompt (stderr)...");
-            OutputStreamWriter stderr_writer = dump_to_console && ! suppress_console ? new OutputStreamWriter(System.err) : null;
-            String error = BashPromptObserver.waitForPrompt(context, sp.getProcessErrorAsReader(context), ! dump_to_console || suppress_console, stderr_writer);
+            OutputStreamWriter stderr_writer = this.dump && ! suppress_console ? new OutputStreamWriter(System.err) : null;
+            String error = BashPromptObserver.waitForPrompt(context, sp.getProcessErrorAsReader(context), ! this.dump || suppress_console, stderr_writer);
             if (stderr_writer != null) { stderr_writer.flush(); }
         }
 
@@ -186,7 +184,7 @@ public class ExpressionEvaluator_Bash extends ExpressionEvaluator_SystemProcess 
 
             exit_value = Integer.parseInt(code_output);
 
-            if (dump_to_console) {
+            if (this.dump) {
                 if (expect_prompt_at_stdout) {
                     sp.configure(context, false, true, false, true, false, false);
                 } else {

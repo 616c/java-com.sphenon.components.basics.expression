@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression.classes;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -22,6 +22,9 @@ import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
 import com.sphenon.basics.operations.*;
 import com.sphenon.basics.operations.classes.*;
+import com.sphenon.basics.operations.factories.*;
+import com.sphenon.basics.data.DataSink;
+import com.sphenon.basics.data.DataSinkBase;
 
 import com.sphenon.basics.expression.*;
 import com.sphenon.basics.expression.returncodes.*;
@@ -68,46 +71,78 @@ public class Activity_Sequence implements Activity, ContextAware {
     }
 
     public Execution execute(CallContext context) {
-        Execution_BasicSequence es = Execution_BasicSequence.createExecutionSequence(context, "sequence");
-        if (this.childs != null) {
+        return execute(context, null);
+    }
 
-            this.execution_control = new MyExecutionControl(context);
+    public Execution execute(CallContext context, DataSink<Execution> execution_sink) {
+        Execution_BasicSequence es = Factory_Execution.createExecutionSequence(context, this.activity_class.getDescription(context));
+        if (execution_sink != null) {
+            execution_sink.set(context, es);
+        }
 
-            for (this.current_activity_index = 0;
-                 this.current_activity_index < this.childs.size();
-                 this.current_activity_index++) {
+        context = Context.create(context);
+        ExecutionContext ec = ExecutionContext.create((Context) context);
+
+        try {
+            ec.beginActiveBlock(context, null);
+
+            if (this.childs != null) {
+
+                this.execution_control = new MyExecutionControl(context);
+
+                for (this.current_activity_index = 0;
+                     this.current_activity_index < this.childs.size();
+                     this.current_activity_index++) {
                 
-                this.current_activity = this.childs.get(this.current_activity_index);
+                    this.current_activity = this.childs.get(this.current_activity_index);
 
-                this.execution_control.setPoint(context, ExecutionControl.Point.BeforeActivity);
-                if (ExecutionContext.notifyInterceptor(context, this.execution_control)) {
-                    if (this.execution_control.getContinuation(context) == ContinuationOption.STEP_OVER) {
-                    } else if (this.execution_control.getContinuation(context) == ContinuationOption.STEP_INTO) {
-                        // nothing to do
-                    } else if (this.execution_control.getContinuation(context) == ContinuationOption.SKIP_STEP) {
-                        continue;
-                    } else if (this.execution_control.getContinuation(context) == ContinuationOption.PROCEED) {
-                    } else if (this.execution_control.getContinuation(context) == ContinuationOption.CANCEL) {
-                        es.addExecution(context, Execution_Basic.createExecutionFailure(context, CustomaryContext.create((Context)context).createExternalIntervention(context, "Sequence aborted by request")));
+                    this.execution_control.setPoint(context, ExecutionControl.Point.BeforeActivity);
+                    if (ExecutionContext.notifyInterceptor(context, this.execution_control)) {
+                        if (this.execution_control.getContinuation(context) == ContinuationOption.STEP_OVER) {
+                        } else if (this.execution_control.getContinuation(context) == ContinuationOption.STEP_INTO) {
+                            // nothing to do
+                        } else if (this.execution_control.getContinuation(context) == ContinuationOption.SKIP_STEP) {
+                            continue;
+                        } else if (this.execution_control.getContinuation(context) == ContinuationOption.PROCEED) {
+                        } else if (this.execution_control.getContinuation(context) == ContinuationOption.CANCEL) {
+                            es.addExecution(context, Factory_Execution.createExecutionFailure(context, CustomaryContext.create((Context)context).createExternalIntervention(context, "Sequence aborted by request")));
+                            break;
+                        }
+                    }
+
+                    Execution current_execution;
+                    try {
+                        current_execution = this.current_activity.execute(context,
+                                                                          execution_sink == null ?
+                                                                             null
+                                                                           : new DataSinkBase<Execution>() {
+                                                                                   public void set(CallContext context, Execution e) {
+                                                                                       es.addExecution(context, e);
+                                                                                   }
+                                                                               }
+                                                                          );
+                    } catch (Throwable t) {
+                        current_execution = Factory_Execution.createExecutionFailure(context, t);
+                    }
+                    if (execution_sink == null) {
+                        es.addExecution(context, current_execution);
+                    }
+
+                    this.execution_control.setPoint(context, ExecutionControl.Point.AfterActivity);
+                    if (ExecutionContext.notifyInterceptor(context, this.execution_control));
+
+                    if (current_execution.getProblemState(context).isGreen(context) == false) {
+                        break;
+                    }
+
+                    if (ec.getBlockIsActive(context) == false) {
                         break;
                     }
                 }
-
-                Execution current_execution;
-                try {
-                    current_execution = this.current_activity.execute(context);
-                } catch (Throwable t) {
-                    current_execution = Execution_Basic.createExecutionFailure(context, t);
-                }
-                es.addExecution(context, current_execution);
-
-                this.execution_control.setPoint(context, ExecutionControl.Point.AfterActivity);
-                if (ExecutionContext.notifyInterceptor(context, this.execution_control));
-
-                if (current_execution.getProblemState(context).isGreen(context) == false) {
-                    break;
-                }
             }
+
+        } finally {
+            ec.finishActiveBlock(context, null);
         }
 
         this.data = new Class_ActivityData(context);

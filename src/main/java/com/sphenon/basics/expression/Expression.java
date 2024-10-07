@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -16,13 +16,19 @@ package com.sphenon.basics.expression;
 
 import com.sphenon.basics.context.*;
 import com.sphenon.basics.context.classes.*;
+import com.sphenon.basics.debug.*;
+import com.sphenon.basics.system.*;
 import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
 import com.sphenon.basics.encoding.*;
+import com.sphenon.basics.system.*;
 import com.sphenon.basics.data.*;
 import com.sphenon.basics.operations.*;
+import com.sphenon.basics.operations.classes.*;
+import com.sphenon.basics.operations.factories.*;
+import com.sphenon.basics.monitoring.*;
 
 import com.sphenon.basics.expression.classes.*;
 import com.sphenon.basics.expression.returncodes.*;
@@ -31,6 +37,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+
 import java.util.regex.*;
 
 import java.io.File;
@@ -86,24 +95,80 @@ public class Expression {
         return new Expression(context, expression).evaluate(context);
     }
 
+    static public Object evaluate(CallContext context, String expression, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression).evaluate(context, (Scope) null, execution_sink);
+    }
+
     static public Object evaluate(CallContext context, String expression, Scope scope) throws EvaluationFailure {
         return new Expression(context, expression).evaluate(context, scope);
+    }
+
+    static public Object evaluate(CallContext context, String expression, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression).evaluate(context, scope, execution_sink);
     }
 
     static public Object evaluate(CallContext context, String expression, String default_evaluators) throws EvaluationFailure {
         return new Expression(context, expression, default_evaluators).evaluate(context);
     }
 
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators).evaluate(context, (Scope) null, execution_sink);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, String default_session, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).evaluate(context, (Scope) null, execution_sink);
+    }
+
     static public Object evaluate(CallContext context, String expression, String default_evaluators, Scope scope) throws EvaluationFailure {
         return new Expression(context, expression, default_evaluators).evaluate(context, scope);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, String default_session, Scope scope) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).evaluate(context, scope);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators).evaluate(context, scope, execution_sink);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, String default_session, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).evaluate(context, scope, execution_sink);
+    }
+
+    static public Object evaluate(CallContext context, String expression, boolean expression_is_static, String default_evaluators, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression, expression_is_static, default_evaluators).evaluate(context, scope, execution_sink);
+    }
+
+    static public Object evaluate(CallContext context, String expression, boolean expression_is_static, String default_evaluators, String default_session, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return new Expression(context, expression, expression_is_static, default_evaluators, default_session).evaluate(context, scope, execution_sink);
     }
 
     static public Object evaluate(CallContext context, String expression, String default_evaluators, Object... arguments) throws EvaluationFailure {
         return new Expression(context, expression, default_evaluators).evaluate(context, arguments);
     }
 
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, DataSink<Execution> execution_sink, Object... arguments) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators).evaluate(context, execution_sink, arguments);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, String default_session, DataSink<Execution> execution_sink, Object... arguments) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).evaluate(context, execution_sink, arguments);
+    }
+
     static public Object evaluate(CallContext context, String expression, String default_evaluators, Map<String,Object> arguments) throws EvaluationFailure {
         return new Expression(context, expression, default_evaluators).evaluate(context, arguments);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, String default_session, Map<String,Object> arguments) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).evaluate(context, arguments);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, DataSink<Execution> execution_sink, Map<String,Object> arguments) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators).evaluate(context, execution_sink, arguments);
+    }
+
+    static public Object evaluate(CallContext context, String expression, String default_evaluators, String default_session, DataSink<Execution> execution_sink, Map<String,Object> arguments) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).evaluate(context, execution_sink, arguments);
     }
 
     static public boolean isTrue(CallContext context, String expression, String default_evaluators, Scope scope) {
@@ -131,30 +196,68 @@ public class Expression {
         return new Expression(context, expression, default_evaluators).parse(context);
     }
 
+    static public ActivityClass parse(CallContext context, String expression, String default_evaluators, String default_session) throws EvaluationFailure {
+        return new Expression(context, expression, default_evaluators, default_session).parse(context);
+    }
+
     public Expression(CallContext context, String expression) {
-        this(context, expression, null, false);
+        this(context, expression, null              , null           , false);
     }
 
     public Expression(CallContext context, String expression, String default_evaluators) {
-        this(context, expression, default_evaluators, false);
+        this(context, expression, default_evaluators, null           , false);
+    }
+
+    public Expression(CallContext context, String expression, String default_evaluators, String default_session) {
+        this(context, expression, default_evaluators, default_session, false);
     }
 
     public Expression(CallContext context, String expression, String default_evaluators, boolean is_dynamic_string) {
-        this.setExpression(context, expression, default_evaluators);
+        this(context, expression, default_evaluators, null           , is_dynamic_string);
+    }
+
+    public Expression(CallContext context, String expression, String default_evaluators, String default_session, boolean is_dynamic_string) {
+        this.setExpression(context, expression, default_evaluators, default_session);
+        this.is_dynamic_string = is_dynamic_string;
+        this.caching_enabled = true;
+    }
+
+    public Expression(CallContext context, String expression, boolean expression_is_static, String default_evaluators) {
+        this(context, expression, expression_is_static, default_evaluators, null           , false);
+    }
+
+    public Expression(CallContext context, String expression, boolean expression_is_static, String default_evaluators, String default_session) {
+        this(context, expression, expression_is_static, default_evaluators, default_session, false);
+    }
+
+    public Expression(CallContext context, String expression, boolean expression_is_static, String default_evaluators, boolean is_dynamic_string) {
+        this(context, expression, expression_is_static, default_evaluators, null           , is_dynamic_string);
+    }
+
+    public Expression(CallContext context, String expression, boolean expression_is_static, String default_evaluators, String default_session, boolean is_dynamic_string) {
+        this.setExpression(context, expression, expression_is_static, default_evaluators, default_session);
         this.is_dynamic_string = is_dynamic_string;
         this.caching_enabled = true;
     }
 
     public Expression(CallContext context, String expression, String default_evaluators, Object... arguments) {
-        this(context, expression, default_evaluators, makeScope(context, arguments));
+        this(context, expression, default_evaluators, null, makeScope(context, arguments));
     }
 
     public Expression(CallContext context, String expression, Scope scope) {
-        this(context, expression, null, scope);
+        this(context, expression, null              , null, scope);
     }
 
     public Expression(CallContext context, String expression, String default_evaluators, Scope scope) {
-        this(context, expression, default_evaluators, false);
+        this(context, expression, default_evaluators, null, scope);
+    }
+
+    public Expression(CallContext context, String expression, String default_evaluators, String default_session, Scope scope) {
+        this(context, expression, default_evaluators, default_session, false, scope);
+    }
+
+    public Expression(CallContext context, String expression, String default_evaluators, String default_session, boolean is_dynamic_string, Scope scope) {
+        this(context, expression, default_evaluators, default_session, is_dynamic_string);
         this.attachScope(context, scope);
     }
 
@@ -178,26 +281,39 @@ public class Expression {
         this.caching_enabled = false;
     }
 
-    static protected ExpressionEvaluatorServiceLocator expression_evaluator_service_locator;
+    static protected List<ExpressionEvaluatorServiceLocator> expression_evaluator_service_locators;
 
-    static public void setExpressionEvaluatorServiceLocator (CallContext context, ExpressionEvaluatorServiceLocator eesl) {
-        expression_evaluator_service_locator = eesl;
+    static public void registerExpressionEvaluatorServiceLocator (CallContext context, ExpressionEvaluatorServiceLocator eesl) {
+        if (expression_evaluator_service_locators == null) {
+            expression_evaluator_service_locators = new ArrayList<ExpressionEvaluatorServiceLocator>();
+        }
+        expression_evaluator_service_locators.add(eesl);
     }
+
+    /* [Issue:LocationRefactoring - space-v2.dia,itlandscapemaintenance.ews,ExpressionEvaluatorServiceLocator_Space.java] */
 
     static public ExpressionEvaluatorService findExpressionEvaluatorService (CallContext context, String location) throws EvaluationFailure {
-        if (expression_evaluator_service_locator == null) {
-            EvaluationFailure.createAndThrow(context, "No expression evaluator service locator available (space package not loaded?)");
-            throw (EvaluationFailure) null;
+        if (expression_evaluator_service_locators != null) {
+            for (ExpressionEvaluatorServiceLocator service_locator : expression_evaluator_service_locators) {
+                ExpressionEvaluatorService service = service_locator.findService(context, location);
+                if (service != null) {
+                    return service;
+                }
+            }
         }
 
-        return expression_evaluator_service_locator.findService(context, location);
+        EvaluationFailure.createAndThrow(context, "Could not locate matching expression evaluator service at location '%(location)'", "location", location);
+        throw (EvaluationFailure) null;
     }
 
-    protected String     expression;
-    protected String     default_evaluators;
-    protected String[][] evaluators;
-    protected String     code;
+    protected String                 expression;
+    protected String                 default_evaluators;
+    protected String                 default_session;
+    protected String[][]             evaluators;
+    protected String                 code;
     protected HashMap<String,Object> embedded_arguments;
+    protected boolean                expression_prepared;
+    protected boolean                expression_is_static;
 
     public String getExpression (CallContext context) {
         return this.expression;
@@ -206,6 +322,11 @@ public class Expression {
     public String getDefaultEvaluators (CallContext context) {
         this.prepareExpression(context);
         return this.default_evaluators;
+    }
+
+    public String getDefaultSession (CallContext context) {
+        this.prepareExpression(context);
+        return this.default_session;
     }
 
     public String[][] getEvaluators (CallContext context) {
@@ -225,15 +346,23 @@ public class Expression {
     static final public String actor_re    = id_re;
     static final public String actor_g_re  = "(" + id_re + ")";
     static final public String step_re     = id_re + "(?:=" + id_re + ")?";
-    static final public String loc_re      = step_re + "(?:/" + step_re + ")*";
-    static final public String loc_g_re    = "(" + loc_re + ")";
+    static final public String loc_re1     = "(?:" + step_re + "(?:/" + step_re + ")*" + ")";
+    static final public String loc_re2     = "(?:\"[^\"]+\")";
+    static final public String loc_re3     = "(?:'[^']+')";
+    static final public String loc_re4     = "(?:@" + id_re + ")";
+    static final public String loc_g_re1   = "(" + step_re + "(?:/" + step_re + ")*" + ")";
+    static final public String loc_g_re2   = "(?:\"([^\"]+)\")";
+    static final public String loc_g_re3   = "(?:'([^']+)')";
+    static final public String loc_g_re4   = "(?:(@" + id_re + "))";
+    static final public String loc_re      = "(?:" + loc_re1 + "|" + loc_re2 + "|" + loc_re3 + "|" + loc_re4 + ")";
+    static final public String loc_g_re    = "(?:" + loc_g_re1 + "|" + loc_g_re2 + "|" + loc_g_re3 + "|" + loc_g_re4 + ")";
     static final public String ssn_re      = id_re;
     static final public String ssn_g_re    = "(" + id_re + ")";
-    static final public String eva_re      = id_opt_re   + "(?:%" + actor_re   + ")?" + "(?:@" + loc_re   + ")?" + "(?:#" + ssn_re   + ")?";
-    static final public String eva_g_r     = id_opt_g_re + "(?:%" + actor_g_re + ")?" + "(?:@" + loc_g_re + ")?" + "(?:#" + ssn_g_re + ")?";
+    static final public String eva_re      = id_opt_re   + "(?:%" + actor_re   + ")?" + "(?:@" + loc_re + ")?" + "(?:#(?:" + ssn_re   + ")?)?";
+    static final public String eva_g_r     = id_opt_g_re + "(?:%" + actor_g_re + ")?" + "(?:@" + loc_g_re + ")?" + "(?:#(?:" + ssn_g_re + ")?)?";
     static final public String arg_re      = "\\(([^\\)]+)\\)";
-    
-    static protected RegularExpression template_re = new RegularExpression("^(" + eva_re + "(?:," + eva_re + ")*" + ")" + "(?:" + arg_re + ")?" + ":");
+
+    static protected RegularExpression template_re = new RegularExpression("^(" + eva_re + "(?:," + eva_re + ")*" + ")?" + "(?:" + arg_re + ")?" + ":");
     static protected RegularExpression evaluator_re = new RegularExpression("^" + eva_g_r + "$");
 
     public String[] setEvaluator (CallContext context, String evaluator_string) {
@@ -242,44 +371,85 @@ public class Expression {
             CustomaryContext.create((Context)context).throwAssertionProvedFalse(context, "Evaluator string '%(string)' unexpectedly does not match evaluator regexp", "string", evaluator_string);
             throw (ExceptionAssertionProvedFalse) null; // compiler insists
         }
-        return em;
+        String alias = em[5];
+        ExpressionContext ec = null;
+        while (alias != null && alias.startsWith("@")) {
+            if (ec == null) {
+                ec = ExpressionContext.get((Context) context);
+                if (ec == null) { break; }
+            }
+            String replacement = ec.getLocationAlias(context, alias.substring(1));
+            if (replacement == null) { break; }
+            alias = replacement;
+        }
+        String[] result = new String[4];
+        result[0] = em[0];
+        result[1] = em[1];
+        result[2] = (   em[2] != null ? em[2]
+                      : alias != null ? alias
+                      : Encoding.recode(context, em[3] != null ? em[3] : em[4], Encoding.URI, Encoding.UTF8)
+                    );
+        result[3] = (em[6] != null ?
+                        (em[6].isEmpty() ? null : em[6])
+                      : this.default_session /* [DELETEME] not a good idea (far too global that approach!) : ExpressionContext.tryGetDefaultScopeId(context) */
+                    );
+        return result;
     }
 
     public void setExpression (CallContext context, String expression) {
-        this.setExpression (context, expression, null);
+        this.setExpression (context, expression, false               , null              , null);
     }
 
-    protected boolean expression_prepared;
-
     public void setExpression (CallContext context, String expression, String default_evaluators) {
+        this.setExpression (context, expression, false               , default_evaluators, null);
+    }
+
+    public void setExpression (CallContext context, String expression, String default_evaluators, String default_session) {
+        this.setExpression (context, expression, false               , default_evaluators, default_session);
+    }
+
+    public void setExpression (CallContext context, String expression, boolean expression_is_static, String default_evaluators) {
+        this.setExpression (context, expression, expression_is_static, default_evaluators, null);
+    }
+
+    public void setExpression (CallContext context, String expression, boolean expression_is_static, String default_evaluators, String default_session) {
         this.expression = expression;
         this.default_evaluators = default_evaluators;
+        this.default_session = default_session;
         this.embedded_arguments = null;
         this.expression_prepared = false;
+        this.expression_is_static = expression_is_static;
     }
 
     protected void prepareExpression(CallContext context) {
         if (this.expression_prepared == false && this.expression != null) {
-            Matcher m = template_re.getMatcher(context, this.expression);
+            Matcher m = null;
             boolean dp_empty = (default_evaluators == null || default_evaluators.length() == 0);
             String argument_string = null;
-            if (m.find()) {
+            if (    this.expression_is_static == false
+                 && (m = template_re.getMatcher(context, this.expression)).find()) {
                 String m1 = m.group(1);
                 boolean empty = (m1 == null || m1.length() == 0);
-                if ( ! empty && ! dp_empty && m1.charAt(0) == ',') {
+                boolean append = false;
+                if ( ! empty && ! dp_empty && ((append = (m1.charAt(0) == ',')) || m1.charAt(m1.length()-1) == ',')) {
                     String[] dps = default_evaluators.split(",");
                     String[] ps = m1.split(",");
                     evaluators = new String[ps.length + dps.length][];
                     int i = 0;
-                    for (String dp : dps) { evaluators[i++] = setEvaluator(context, dp); }
-                    for (String p : ps) { evaluators[i++] = setEvaluator(context, p); }
+                    if (append) {
+                        for (String dp : dps) { evaluators[i++] = setEvaluator(context, dp); }
+                        for (String p : ps) { evaluators[i++] = setEvaluator(context, p); }
+                    } else {
+                        for (String p : ps) { evaluators[i++] = setEvaluator(context, p); }
+                        for (String dp : dps) { evaluators[i++] = setEvaluator(context, dp); }
+                    }
                 } else {
                     String[] ps = (empty ? (dp_empty ? new String[0] : default_evaluators.split(",")) : m1.split(","));
                     evaluators = new String[ps.length][];
                     int i = 0;
                     for (String p : ps) { evaluators[i++] = setEvaluator(context, p); }
                 }
-                this.code = (empty ? ":" : "") + this.expression.substring(m.end());
+                this.code = this.expression.substring(m.end());
                 argument_string = m.group(2);
             } else {
                 String[] ps;
@@ -336,8 +506,16 @@ public class Expression {
         return this.evaluate(context, makeScope(context, arguments));
     }
 
+    public Object evaluate(CallContext context, DataSink<Execution> execution_sink, Object... arguments) throws EvaluationFailure {
+        return this.evaluate(context, makeScope(context, arguments), execution_sink);
+    }
+
     public Object evaluate(CallContext context, Map<String,Object> arguments) throws EvaluationFailure {
         return this.evaluate(context, makeScope(context, arguments));
+    }
+
+    public Object evaluate(CallContext context, DataSink<Execution> execution_sink, Map<String,Object> arguments) throws EvaluationFailure {
+        return this.evaluate(context, makeScope(context, arguments), execution_sink);
     }
 
     static protected class CacheEntry {
@@ -363,6 +541,10 @@ public class Expression {
     }
 
     public Object evaluate(CallContext context, Scope scope) throws EvaluationFailure {
+        return evaluate(context, scope, (DataSink<Execution>) null);
+    }
+
+    public Object evaluate(CallContext context, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
         if (scope != null && attached_scope != null) {
             CustomaryContext.create((Context)context).throwPreConditionViolation(context, "Expression evaluation invoked with scope, but expression is already attached to a scope");
             throw (ExceptionPreConditionViolation) null; // compiler insists
@@ -370,7 +552,7 @@ public class Expression {
 
         if (this.caching_enabled && doLoadExpressionCache(context) && ejc != null) {
             try {
-                ExpressionJavaCache.Result ejcr = ejc.evaluate(context, this.expression, this.default_evaluators, scope);
+                ExpressionJavaCache.Result ejcr = ejc.evaluate(context, this.expression, this.default_evaluators, scope, execution_sink);
                 if (ejcr != null) {
                     return ejcr.result;
                 }
@@ -400,11 +582,36 @@ public class Expression {
                 current = ((ExpressionSource) current).getString(context, new ArgumentSerialiser_ByName(context), current_scope);
             }
 
-            if (location != null && location.isEmpty() == false) {
-                ExpressionEvaluatorService ees = findExpressionEvaluatorService(context, location);
-                current = ees.evaluateWithEvaluator(context, (String) current, id, current_scope, actor, session);
+            if (id.equals("check")) {
+                if (current instanceof Execution) {
+                    Execution execution = (Execution) current;
+                    ProblemState ps = execution.getProblemState(context);
+                    if (execution_sink != null) {
+                        execution_sink.set(context, execution);
+                    }
+                    if (ps.isRed(context)) {
+                        EvaluationFailure.createAndThrow(context, new ThrowableData(context, execution), "Expression returned execution failure");
+                        throw (EvaluationFailure) null;
+                    }
+                    current = ps == null ? "" : ps.toString();
+                } else if (current instanceof Throwable) {
+                    if (execution_sink != null) {
+                        execution_sink.set(context, Factory_Execution.createExecutionFailure(context, (Throwable) current));
+                    }
+                    EvaluationFailure.createAndThrow(context, (Throwable) current, "Expression returned exception (Throwable)");
+                    throw (EvaluationFailure) null;
+                }
+            } else if (id.equals("log")) {
+                SystemContext.err.stream(context).flush();
+                Dumper.dumpToStream(context, null, current, SystemContext.err.stream(context));
+                SystemContext.err.stream(context).flush();
             } else {
-                current = evaluateWithEvaluator(context, (String) current, id, current_scope, actor, session);
+                if (location != null && location.isEmpty() == false) {
+                    ExpressionEvaluatorService ees = findExpressionEvaluatorService(context, location);
+                    current = ees.evaluateWithEvaluator(context, (String) current, id, current_scope, actor, session, execution_sink);
+                } else {
+                    current = evaluateWithEvaluator(context, (String) current, id, current_scope, actor, session, execution_sink);
+                }
             }
         }
 
@@ -448,7 +655,7 @@ public class Expression {
         if (this.embedded_arguments != null) {
             scope = new Class_Scope(context, null, true, this.attached_scope, this.embedded_arguments);
         }
-        return new ActivityClass_ExpressionEvaluatorSequence(context, evaluators, code, scope, this.getRegistry(context));
+        return new ActivityClass_ExpressionEvaluatorSequence(context, this.evaluators, this.code, scope, this.expression, this.getRegistry(context));
     }
 
     protected ExpressionEvaluatorRegistry registry;
@@ -525,11 +732,11 @@ public class Expression {
         return current_scope;
     }
 
-    public Object evaluateWithEvaluator(CallContext context, String code, String evaluator_id, Scope current_scope, String actor_id, String session_id) throws EvaluationFailure {
-        return evaluateWithEvaluator(context, code, evaluator_id, current_scope, actor_id, session_id, this.is_dynamic_string, this.getRegistry(context));
+    public Object evaluateWithEvaluator(CallContext context, String code, String evaluator_id, Scope current_scope, String actor_id, String session_id, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        return evaluateWithEvaluator(context, code, evaluator_id, current_scope, actor_id, session_id, this.is_dynamic_string, this.getRegistry(context), execution_sink);
     }
 
-    static public Object evaluateWithEvaluator(CallContext context, String code, String evaluator_id, Scope current_scope, String actor_id, String session_id, boolean is_dynamic_string, ExpressionEvaluatorRegistry registry) throws EvaluationFailure {
+    static public Object evaluateWithEvaluator(CallContext context, String code, String evaluator_id, Scope current_scope, String actor_id, String session_id, boolean is_dynamic_string, ExpressionEvaluatorRegistry registry, DataSink<Execution> execution_sink) throws EvaluationFailure {
         if (registry == null) {
             registry = ExpressionEvaluatorRegistry.getDefaultExpressionRegistry(context);
         }
@@ -537,7 +744,7 @@ public class Expression {
 
         current_scope = mergeScopeWithSessionScope(context, current_scope, actor_id, session_id);
 
-        return evaluator.evaluate(context, code, current_scope);
+        return evaluator.evaluate(context, code, current_scope, execution_sink);
     }
 
     static public ActivityClass parseWithEvaluator(CallContext context, String code, String evaluator_id, boolean is_dynamic_string, ExpressionEvaluatorRegistry registry) throws EvaluationFailure {
@@ -557,16 +764,18 @@ public class Expression {
 
     static protected Scope makeScope(CallContext context, Object... arguments) {
         if (arguments != null && arguments.length % 2 != 0) {
-            CustomaryContext.create((Context)context).throwPreConditionViolation(context, "Expression evaluation invoked with odd number of arguments");
+            CustomaryContext.create((Context)context).throwPreConditionViolation(context, "Expression evaluation invoked with odd number of arguments: %(arguments)", "arguments", StringUtilities.join(context, arguments, "'", ", ", "'", true));
             throw (ExceptionPreConditionViolation) null; // compiler insists
         }
         Class_Scope scope = new Class_Scope(context);
-        for (int i=0; i<arguments.length; i+=2) {
-            try {
-                scope.set(context, (String) arguments[i], arguments[i+1]);
-            } catch (ClassCastException cce) {
-                CustomaryContext.create((Context)context).throwPreConditionViolation(context, "Expression evaluation invoked with an agument name which is not a String, but a '%(class)'", "class", arguments[i].getClass());
-                throw (ExceptionPreConditionViolation) null; // compiler insists
+        if (arguments != null) {
+            for (int i=0; i<arguments.length; i+=2) {
+                try {
+                    scope.set(context, (String) arguments[i], arguments[i+1]);
+                } catch (ClassCastException cce) {
+                    CustomaryContext.create((Context)context).throwPreConditionViolation(context, "Expression evaluation invoked with an agument name which is not a String, but a '%(class)'", "class", arguments[i].getClass());
+                    throw (ExceptionPreConditionViolation) null; // compiler insists
+                }
             }
         }
         scope.setIsSealed(context, true);
@@ -575,8 +784,10 @@ public class Expression {
 
     static protected Scope makeScope(CallContext context, Map<String,Object> arguments) {
         Class_Scope scope = new Class_Scope(context);
-        for (String key : arguments.keySet()) {
-            scope.set(context, key, arguments.get(key));
+        if (arguments != null) {
+            for (String key : arguments.keySet()) {
+                scope.set(context, key, arguments.get(key));
+            }
         }
         scope.setIsSealed(context, true);
         return scope;
@@ -624,7 +835,7 @@ public class Expression {
                     pw.print("import com.sphenon.basics.exception.*;\n");
                     pw.print("import com.sphenon.basics.customary.*;\n");
                     pw.print("import com.sphenon.basics.configuration.*;\n");
-                    pw.print("import com.sphenon.basics.expression.*;;\n");
+                    pw.print("import com.sphenon.basics.data.*;\n");
                     pw.print("\n");
                     pw.print("import java.util.Hashtable;\n");
                     pw.print("import java.util.Vector;\n");
@@ -651,7 +862,7 @@ public class Expression {
                     pw.print("        return new Result(jse.evaluate(context, scope));\n");
                     pw.print("    }\n");
                     pw.print("\n");
-                    pw.print("    public Result evaluate(CallContext context, String expression, String default_evaluators, Scope scope) throws Throwable {\n");
+                    pw.print("    public Result evaluate(CallContext context, String expression, String default_evaluators, Scope scope, DataSink<Execution> execution_sink) throws Throwable {\n");
                     pw.print("        Result result = null;\n");
                     pw.print("        int hashcode = (default_evaluators == null ? 0 : default_evaluators.hashCode()) ^ expression.hashCode();\n");
                     pw.print("        switch (hashcode) {\n");
@@ -727,8 +938,8 @@ public class Expression {
                     if (jspp2) {
                         expression = expression.substring(5);
                     }
-                    expression = (String) evaluateWithEvaluator(context, expression, "jsppreloc", null, null, null, false, registry);
-                    expression = (String) evaluateWithEvaluator(context, expression, "jsppreoptvar", null, null, null, false, registry);
+                    expression = (String) evaluateWithEvaluator(context, expression, "jsppreloc", null, null, null, false, registry, null);
+                    expression = (String) evaluateWithEvaluator(context, expression, "jsppreoptvar", null, null, null, false, registry, null);
                 } else {
                     if (js2) {
                         expression = expression.substring(3);

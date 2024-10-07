@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -23,6 +23,7 @@ import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
 import com.sphenon.basics.operations.*;
 import com.sphenon.basics.operations.classes.*;
+import com.sphenon.basics.operations.factories.*;
 
 import com.sphenon.basics.expression.classes.*;
 import com.sphenon.basics.expression.returncodes.*;
@@ -31,18 +32,19 @@ import java.util.Vector;
 
 public class ActivityHandler_Expression extends ActivityHandler {
 
-    protected ActivityHandler_Expression(CallContext context, Expression expression, ExpressionSource expression_source, String expression_string, String default_evaluators, String evaluator_id, String actor_id, String location, String session_id, ExpressionEvaluatorRegistry registry) {
+    protected ActivityHandler_Expression(CallContext context, Expression expression, ExpressionSource expression_source, String expression_string, String default_evaluators, String default_session, String evaluator_id, String actor_id, String location, String session_id, ExpressionEvaluatorRegistry registry) {
         super(context);
-        this.expression = expression;
-        this.expression_string = expression_string;
-        this.expression_source = expression_source;
+        this.expression         = expression;
+        this.expression_string  = expression_string;
+        this.expression_source  = expression_source;
         this.default_evaluators = default_evaluators;
-        this.evaluator_id = evaluator_id;
-        this.actor_id = actor_id;
-        this.location = location;
-        this.session_id = session_id;
-        this.registry = registry;
-        this.is_valid = true;
+        this.default_session    = default_session;
+        this.evaluator_id       = evaluator_id;
+        this.actor_id           = actor_id;
+        this.location           = location;
+        this.session_id         = session_id;
+        this.registry           = registry;
+        this.is_valid           = true;
     }
 
     static public ActivityHandler_Expression create(CallContext context, Expression expression) {
@@ -50,7 +52,7 @@ public class ActivityHandler_Expression extends ActivityHandler {
             CustomaryContext.create((Context)context).throwPreConditionViolation(context, "ActivityHandler_Expression, invalid argument 'expression' (null)");
             throw (ExceptionPreConditionViolation) null; // compiler insists
         }
-        return new ActivityHandler_Expression(context, expression, null, null, null, null, null, null, null, null);
+        return new ActivityHandler_Expression(context, expression, null, null             , null              , null           , null, null, null, null, null);
     }
 
     static public ActivityHandler_Expression create(CallContext context, String expression_string) {
@@ -58,7 +60,7 @@ public class ActivityHandler_Expression extends ActivityHandler {
             CustomaryContext.create((Context)context).throwPreConditionViolation(context, "ActivityHandler_Expression, invalid argument 'expression_string' (null)");
             throw (ExceptionPreConditionViolation) null; // compiler insists
         }
-        return new ActivityHandler_Expression(context, null, null, expression_string, null, null, null, null, null, null);
+        return new ActivityHandler_Expression(context, null      , null, expression_string, null              , null           , null, null, null, null, null);
     }
 
     static public ActivityHandler_Expression create(CallContext context, String expression_string, String default_evaluators) {
@@ -66,7 +68,15 @@ public class ActivityHandler_Expression extends ActivityHandler {
             CustomaryContext.create((Context)context).throwPreConditionViolation(context, "ActivityHandler_Expression, invalid argument 'expression_string' (null)");
             throw (ExceptionPreConditionViolation) null; // compiler insists
         }
-        return new ActivityHandler_Expression(context, null, null, expression_string, default_evaluators, null, null, null, null, null);
+        return new ActivityHandler_Expression(context, null      , null, expression_string, default_evaluators, null           , null, null, null, null, null);
+    }
+
+    static public ActivityHandler_Expression create(CallContext context, String expression_string, String default_evaluators, String default_session) {
+        if (expression_string == null) {
+            CustomaryContext.create((Context)context).throwPreConditionViolation(context, "ActivityHandler_Expression, invalid argument 'expression_string' (null)");
+            throw (ExceptionPreConditionViolation) null; // compiler insists
+        }
+        return new ActivityHandler_Expression(context, null      , null, expression_string, default_evaluators, default_session, null, null, null, null, null);
     }
 
     static public ActivityHandler_Expression createWithEvaluatorId(CallContext context, String expression_string, String evaluator_id, String actor_id, String location, String session_id, ExpressionEvaluatorRegistry registry) {
@@ -78,7 +88,7 @@ public class ActivityHandler_Expression extends ActivityHandler {
             CustomaryContext.create((Context)context).throwPreConditionViolation(context, "ActivityHandler_Expression, invalid argument 'evaluator_id' (null)");
             throw (ExceptionPreConditionViolation) null; // compiler insists
         }
-        return new ActivityHandler_Expression(context, null, null, expression_string, null, evaluator_id, actor_id, location, session_id, registry);
+        return new ActivityHandler_Expression(context, null, null, expression_string, null, null, evaluator_id, actor_id, location, session_id, registry);
     }
 
     static public ActivityHandler_Expression createWithEvaluatorId(CallContext context, ExpressionSource expression_source, String evaluator_id, String actor_id, String location, String session_id, ExpressionEvaluatorRegistry registry) {
@@ -90,7 +100,7 @@ public class ActivityHandler_Expression extends ActivityHandler {
             CustomaryContext.create((Context)context).throwPreConditionViolation(context, "ActivityHandler_Expression, invalid argument 'evaluator_id' (null)");
             throw (ExceptionPreConditionViolation) null; // compiler insists
         }
-        return new ActivityHandler_Expression(context, null, expression_source, null, null, evaluator_id, actor_id, location, session_id, registry);
+        return new ActivityHandler_Expression(context, null, expression_source, null, null, null, evaluator_id, actor_id, location, session_id, registry);
     }
 
     static public ActivityHandler_Expression createWithEvaluatorId(CallContext context, Object expression_source_or_string, String evaluator_id, String actor_id, String location, String session_id, ExpressionEvaluatorRegistry registry) {
@@ -126,6 +136,12 @@ public class ActivityHandler_Expression extends ActivityHandler {
 
     public String getDefaultEvaluators (CallContext context) {
         return this.default_evaluators;
+    }
+
+    protected String default_session;
+
+    public String getDefaultSession (CallContext context) {
+        return this.default_session;
     }
 
     protected String evaluator_id;
@@ -172,22 +188,22 @@ public class ActivityHandler_Expression extends ActivityHandler {
                     if (this.location != null && this.location.isEmpty() == false) {
                         if (this.registry != null) {
                             this.is_valid = false;
-                            this.execution = Execution_Basic.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both a location and a registry is provided");
+                            this.execution = Factory_Execution.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both a location and a registry is provided");
                         }
                         if (this.service != null) {
                             this.is_valid = false;
-                            this.execution = Execution_Basic.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both a location and a service is provided");
+                            this.execution = Factory_Execution.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both a location and a service is provided");
                         }
                         this.service = Expression.findExpressionEvaluatorService(context, this.location);
                     }
 
                     if (this.registry != null && this.service != null) {
                         this.is_valid = false;
-                        this.execution = Execution_Basic.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both a service and a registry is provided");
+                        this.execution = Factory_Execution.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both a service and a registry is provided");
                     }
 
                     if (this.expression_string != null && this.expression_source == null && this.evaluator_id == null && this.expression == null) {
-                        this.expression = new Expression(context, this.expression_string, this.default_evaluators);
+                        this.expression = new Expression(context, this.expression_string, this.default_evaluators, this.default_session);
                     }
                     if (this.expression != null && this.expression_source == null && this.evaluator_id == null) {
                         this.activity_class = this.expression.parse(context);
@@ -197,7 +213,7 @@ public class ActivityHandler_Expression extends ActivityHandler {
                             // context of space-service-expressions
                             // at present this is just an assertion here
                             this.is_valid = false;
-                            this.execution = Execution_Basic.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both an expression and a registry is provided");
+                            this.execution = Factory_Execution.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both an expression and a registry is provided");
                         }
                         if (this.service != null) {
                             // maybe this check is wrong and we need to
@@ -205,7 +221,7 @@ public class ActivityHandler_Expression extends ActivityHandler {
                             // space-service-expressions
                             // at present this is just an assertion here
                             this.is_valid = false;
-                            this.execution = Execution_Basic.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both an expression and a service is provided");
+                            this.execution = Factory_Execution.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression, both an expression and a service is provided");
                         }
                     } else if (this.expression == null && this.expression_string != null && this.expression_source == null && this.evaluator_id != null) {
                         if (this.service != null) {
@@ -221,11 +237,11 @@ public class ActivityHandler_Expression extends ActivityHandler {
                         }
                     } else {
                         this.is_valid = false;
-                        this.execution = Execution_Basic.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression");
+                        this.execution = Factory_Execution.createExecutionFailure(context, "Invalid combination of arguments in ActivityHandler_Expression");
                      }
                 } catch (EvaluationFailure ef) {
                     this.is_valid = false;
-                    this.execution = Execution_Basic.createExecutionFailure(context, ef);
+                    this.execution = Factory_Execution.createExecutionFailure(context, ef);
                 }
             }
         }

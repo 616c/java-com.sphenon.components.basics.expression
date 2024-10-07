@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -21,8 +21,11 @@ import com.sphenon.basics.debug.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
+import com.sphenon.basics.system.*;
 import com.sphenon.basics.operations.*;
 import com.sphenon.basics.operations.classes.*;
+import com.sphenon.basics.operations.factories.*;
+import com.sphenon.basics.data.DataSink;
 
 import com.sphenon.basics.expression.returncodes.*;
 
@@ -64,6 +67,16 @@ public class ActivityHandler {
         return this.execution;
     }
 
+    protected DataSink<Execution> execution_sink;
+
+    public DataSink<Execution> getExecutionSink (CallContext context) {
+        return this.execution_sink;
+    }
+
+    public void setExecutionSink (CallContext context, DataSink<Execution> execution_sink) {
+        this.execution_sink = execution_sink;
+    }
+
     public Vector<ActivityAttribute> getAttributes(CallContext context) {
         if (this.activity_class == null) { return null; }
         ActivityInterface activity_interface = this.activity_class.getInterface(context);
@@ -85,6 +98,13 @@ public class ActivityHandler {
         return activity_data.getSlotValue(context, name);
     }
 
+    public Object getSlotValue(CallContext context, int index) {
+        if (this.activity == null) { return null; }
+        ActivityData activity_data = this.activity.getData(context);
+        if (activity_data == null) { return null; }
+        return activity_data.getSlotValue(context, index);
+    }
+
     public boolean isValid(CallContext context) {
         return this.is_valid;
     }
@@ -97,7 +117,10 @@ public class ActivityHandler {
                 }
             } catch (EvaluationFailure ef) {
                 this.is_valid = false;
-                this.execution = Execution_Basic.createExecutionFailure(context, ef);
+                this.execution = Factory_Execution.createExecutionFailure(context, ef);
+                if (this.execution_sink != null) {
+                    this.execution_sink.set(context, this.execution);
+                }
             }
         }
         return this;
@@ -108,7 +131,7 @@ public class ActivityHandler {
 
         if (this.is_valid) {
             if (this.execution == null) {
-                this.execution = this.activity.execute(context);
+                this.execution = this.activity.execute(context, this.execution_sink);
             }
 
             if (this.execution.getProblemState(context).isOk(context) == false) {
@@ -127,6 +150,7 @@ public class ActivityHandler {
     public void dumpData(CallContext context) {
         Vector<ActivitySlot> slots = this.getSlots(context);
         if (slots != null) {
+            SystemContext sc = SystemContext.getOrCreate((Context) context);
             int size = slots.size();
             for (ActivitySlot slot : slots) {
                 Object result = slot.getValue(context);
@@ -135,11 +159,11 @@ public class ActivityHandler {
                     String string_result = ContextAware.ToString.convert(context, result);
                     if (string_result.isEmpty() == false) {
                         if (size != 1) {
-                            System.err.print(slot.getAttribute(context).getName(context) + " = ");
+                            sc.getErrorStream(context).print(slot.getAttribute(context).getName(context) + " = ");
                         }
-                        System.err.print(string_result);
+                        sc.getErrorStream(context).print(string_result);
                         if (string_result.charAt(string_result.length()-1) != '\n') {
-                            System.err.println("");
+                            sc.getErrorStream(context).println("");
                         }
                     }
                 }

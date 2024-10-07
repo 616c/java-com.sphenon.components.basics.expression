@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -20,6 +20,9 @@ import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import java.util.regex.*;
 
@@ -76,12 +79,32 @@ public class RegularExpression {
         return pattern.matcher(input);
     }
 
+    public Pattern getPattern(CallContext context) {
+        return pattern;
+    }
+
     public String replaceAll(CallContext context, String text) {
         return this.getMatcher(context, text).replaceAll(this.replacement);
     }
 
     public String replaceFirst(CallContext context, String text) {
         return this.getMatcher(context, text).replaceFirst(this.replacement);
+    }
+
+    @FunctionalInterface
+    static public interface Replacer {
+        String replace(CallContext context, String[] matches, Matcher matcher, RegularExpression regexp);
+    }
+
+    public String replaceAll(CallContext context, String text, Replacer replacer) {
+        StringBuffer sb = new StringBuffer();
+        Matcher m = this.getMatcher(context, text);
+        while (m.find()) {
+            String[] ms = this.tryGetMatches(context, m);
+            m.appendReplacement(sb, replacer.replace(context, ms, m, this));
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     public boolean matches(CallContext context, String text) {
@@ -93,9 +116,23 @@ public class RegularExpression {
     }
 
     public String[] tryGetMatches(CallContext context, String text) {
+        return tryGetMatches(context, text, null);
+    }
+
+    public String[] tryGetMatches(CallContext context, String text, Map<String,String> named_groups, String... names) {
         if (text == null) { return null; }
         Matcher matcher = pattern.matcher(text);
         if ( ! matcher.find()) { return null; }
+        this.tryGetNamedMatches(context, matcher, named_groups, names);
+        return this.tryGetGroupMatches(context, matcher);
+    }
+
+    public String[] tryGetMatches(CallContext context, Matcher matcher) {
+        if ( ! matcher.find()) { return null; }
+        return this.tryGetGroupMatches(context, matcher);
+    }
+
+    protected String[] tryGetGroupMatches(CallContext context, Matcher matcher) {
         String[] result = new String[matcher.groupCount()];
         for (int g=1; g<=matcher.groupCount(); g++) {
             result[g-1] = matcher.group(g);
@@ -103,13 +140,16 @@ public class RegularExpression {
         return result;
     }
 
-    public String[] tryGetMatches(CallContext context, Matcher matcher) {
-        if ( ! matcher.find()) { return null; }
-        String[] result = new String[matcher.groupCount()];
-        for (int g=1; g<=matcher.groupCount(); g++) {
-            result[g-1] = matcher.group(g);
+    protected void tryGetNamedMatches(CallContext context, Matcher matcher, Map<String,String> named_groups, String... names) {
+        if (named_groups != null && names != null) {
+            named_groups.clear();
+            for (String name : names) {
+                String value = matcher.group(name);
+                if (value != null) {
+                    named_groups.put(name, value);
+                }
+            }
         }
-        return result;
     }
 
     public String[] getMatches(CallContext context, String text, String help_text) {

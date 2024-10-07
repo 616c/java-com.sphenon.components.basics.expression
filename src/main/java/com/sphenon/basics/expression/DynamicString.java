@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -62,11 +62,23 @@ public class DynamicString {
     protected Expression expression;
 
     public DynamicString(CallContext context, String string_template) {
-        this(context, string_template, null);
+        this(context, string_template, null, null, null);
+    }
+
+    public DynamicString(CallContext context, String string_template, Scope scope) {
+        this(context, string_template, null, null, scope);
     }
 
     public DynamicString(CallContext context, String string_template, String default_processors) {
         this.expression = new Expression(context, string_template, default_processors, true);
+    }
+
+    public DynamicString(CallContext context, String string_template, String default_processors, String default_session) {
+        this.expression = new Expression(context, string_template, default_processors, default_session, true);
+    }
+
+    public DynamicString(CallContext context, String string_template, String default_processors, String default_session, Scope scope) {
+        this.expression = new Expression(context, string_template, default_processors, default_session, true, scope);
     }
 
     public String getStringTemplate (CallContext context) {
@@ -83,6 +95,10 @@ public class DynamicString {
 
     public void setStringTemplate (CallContext context, String string_template, String default_processors) {
         this.expression.setExpression(context, string_template, default_processors);
+    }
+
+    public void setStringTemplate (CallContext context, String string_template, String default_processors, String default_session) {
+        this.expression.setExpression(context, string_template, default_processors, default_session);
     }
 
     public void attachScope(CallContext context, Scope attached_scope) {

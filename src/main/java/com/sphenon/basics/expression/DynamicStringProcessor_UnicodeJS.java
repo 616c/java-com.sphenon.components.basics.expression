@@ -1,7 +1,7 @@
 package com.sphenon.basics.expression;
 
 /****************************************************************************
-  Copyright 2001-2018 Sphenon GmbH
+  Copyright 2001-2024 Sphenon GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy
@@ -20,14 +20,18 @@ import com.sphenon.basics.message.*;
 import com.sphenon.basics.notification.*;
 import com.sphenon.basics.exception.*;
 import com.sphenon.basics.customary.*;
+import com.sphenon.basics.data.*;
+import com.sphenon.basics.operations.*;
+import com.sphenon.basics.operations.classes.*;
+import com.sphenon.basics.operations.factories.*;
 
 import com.sphenon.basics.expression.classes.*;
 import com.sphenon.basics.expression.returncodes.*;
 import com.sphenon.basics.expression.unicode.*;
 
-public class ExpressionEvaluator_Unicode implements ExpressionEvaluator {
+public class DynamicStringProcessor_UnicodeJS implements ExpressionEvaluator {
 
-    public ExpressionEvaluator_Unicode (CallContext context) {
+    public DynamicStringProcessor_UnicodeJS (CallContext context) {
         this.result_attribute = new Class_ActivityAttribute(context, "Result", "Object", "-", "*");
         this.activity_interface = new Class_ActivityInterface(context);
         this.activity_interface.addAttribute(context, this.result_attribute);
@@ -37,17 +41,23 @@ public class ExpressionEvaluator_Unicode implements ExpressionEvaluator {
     protected ActivityAttribute result_attribute;
 
     public String[] getIds(CallContext context) {
-        return new String[] { "u", "unicode" };
+        return new String[] { "ujs", "unicodejs" };
     }
 
-    public Object evaluate(CallContext context, String string, Scope scope) throws EvaluationFailure {
-        String mode = (scope == null ? null : ((String) scope.tryGet(context, "mode")));
-        if (mode == null || mode.isEmpty()) { mode = "pgm"; }
+    public Object evaluate(CallContext context, String string, Scope scope, DataSink<Execution> execution_sink) throws EvaluationFailure {
+        Execution_Basic e = null;
+        if (execution_sink != null) {
+            e = (Execution_Basic) Factory_Execution.createExecutionInProgress(context, "unicodejs: " + string);
+            execution_sink.set(context, e);
+        }
 
         try {
-            return XCUS2ASCII.parse(context, string, mode);
+            Object result = XCUS2ASCII.parse(context, string, "js");
+            if (e != null) { e.setSuccess(context); }
+            return result;
         } catch (ParseException pe) {
-            EvaluationFailure.createAndThrow(context, pe, "Evaluation failed while converting Unicode to ASCII in '%(code)'", "code", string);
+            if (e != null) { e.setFailure(context, pe); }
+            EvaluationFailure.createAndThrow(context, pe, "Evaluation failed while converting Unicode (JS) to ASCII in '%(code)'", "code", string);
             throw (EvaluationFailure) null;
         }
     }
